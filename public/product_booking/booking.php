@@ -11,8 +11,12 @@ $bokun = new BokunClient(
 );
 
 try {
-    $result = $bokun->get('/product-list.json/list', ['lang' => 'EN']);
-    dd($result['status'], $result['data']);
+    $result = $bokun->post('/booking.json/product-booking-search', [
+        'page' => 1,
+        'pageSize' => 100
+    ]);
+
+    dd($result['status'], $result['data'], $result['data']['results'][0]);
 } catch (\Throwable $e) {
     dd('Error:', $e->getMessage());
 }

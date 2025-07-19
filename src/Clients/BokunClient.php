@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Clients;
 
 class BokunClient
@@ -44,6 +42,42 @@ class BokunClient
 
         return ['status' => $status, 'data' => $data];
     }
+
+    public function post(string $path, array $body = []): array
+    {
+        $method = 'POST';
+        $date = gmdate('Y-m-d H:i:s');
+        $fullPath = $this->buildPath($path, []);
+        $signature = $this->sign($date, $method, $fullPath);
+
+        $ch = curl_init($this->appUrl . $fullPath);
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPHEADER => array_merge(
+                $this->buildHeaders($date, $signature),
+                ['Content-Type: application/json']
+            ),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($body),
+        ]);
+
+        $response = curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \RuntimeException("cURL error: $error");
+        }
+
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException("Invalid JSON: $response");
+        }
+
+        return ['status' => $status, 'data' => $data];
+    }
+
 
     private function sign(string $date, string $method, string $path): string
     {
