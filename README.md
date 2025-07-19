@@ -13,8 +13,8 @@
 ## 🛠️ Installation
 
 ```bash
-git clone https://your.repo/php-bokun-client.git
-cd php-bokun-client
+git clone https://github.com/Fikkie007/bokun-test-api
+cd bokun-test-api
 composer install
 cp .env.example .env
 ```
